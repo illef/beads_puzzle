@@ -84,6 +84,14 @@ impl Map {
         set
     }
 
+    pub fn new_with_fill(width: i32, height: i32, fills: Vec<(i32, i32)>) -> Self {
+        let mut m = Map::new(width, height, &[]);
+        for (x, y) in fills {
+            *m.get_cell((x, y)).unwrap() = 13;
+        }
+        m
+    }
+
     pub fn new(width: i32, height: i32, first_line: &[i32]) -> Map {
         let mut m = Map {
             width,
@@ -143,7 +151,7 @@ impl Display for Map {
         for i in 0..self.content.len() {
             match self.content[i] {
                 0 => write!(f, "{}", Colour::RGB(44, 50, 60).paint("●"))?,
-                v => write!(f, "{}", get_color_idx(v, 12).paint("●"))?,
+                v => write!(f, "{}", get_color_idx(v, 14).paint("●"))?,
             }
 
             if (i + 1) % self.width as usize == 0 {

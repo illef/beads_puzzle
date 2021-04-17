@@ -1,5 +1,6 @@
 #![rustfmt::skip]
 
+use std::collections::BTreeSet;
 
 // 5 x 5 block
 #[derive(Debug, Clone, Ord, PartialOrd, PartialEq, Eq)]
@@ -8,7 +9,23 @@ pub struct Block{
     content: Vec<i32>,
 }
 
+
 impl Block {
+    pub fn get_all() -> BTreeSet<Block>{
+       vec![Block::new(init::B0), 
+            Block::new(init::B1),
+            Block::new(init::B2),
+            Block::new(init::B3),
+            Block::new(init::B4),
+            Block::new(init::B5),
+            Block::new(init::B6),
+            Block::new(init::B7),
+            Block::new(init::B8),
+            Block::new(init::B9),
+            Block::new(init::B10),
+            Block::new(init::B11)
+        ].into_iter().collect()
+    }
     pub fn new(b : &'static [i32])-> Self{
         Block{
             initial_value: b,
