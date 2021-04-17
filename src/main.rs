@@ -1,5 +1,10 @@
+#[allow(dead_code)]
+mod block;
+
+#[allow(dead_code)]
 mod map;
 
+use block::*;
 use map::*;
 
 fn main() {
