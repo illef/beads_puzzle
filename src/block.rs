@@ -2,14 +2,10 @@
 
 
 // 5 x 5 block
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Ord, PartialOrd, PartialEq, Eq)]
 pub struct Block{
     initial_value : &'static [i32],
     content: Vec<i32>,
-    pub rotate_count: u8, // 0..4 까지 값이 올 수 있다. 몇번 rotate되었는지 확인하기 위한 용도
-    pub reversed : bool, // 좌우 반전 여부
-    pub width_move_count : i8 , // 가로 평행이동 숫자 -4 <= x <= 4
-    pub height_move_count : i8, // 세로 평행이동 숫자 -4 <= x <- 4
 }
 
 impl Block {
@@ -17,10 +13,6 @@ impl Block {
         Block{
             initial_value: b,
             content: b[..].to_vec(),
-            rotate_count :0,
-            reversed: false,
-            width_move_count: 0,
-            height_move_count: 0,
         }
     }
 
@@ -34,7 +26,6 @@ impl Block {
     }
 
     pub fn reverse(&mut self) {
-        self.reversed = !self.reversed;
         for y in 0..5 {
             for x in 0..3 {
                 let temp : i32 = *self.get_cell((x,y)).unwrap();
@@ -45,7 +36,6 @@ impl Block {
     }
 
     pub fn rotate(&mut self) -> &Self{
-        self.rotate_count = self.rotate_count + 1;
         let mut org = self.clone();
         for y in 0..5{
             for x in 0..5 {
@@ -57,7 +47,6 @@ impl Block {
 
     pub fn move_left(&mut self)-> &Self{
         let mut zero =0;
-        self.width_move_count += -1;
         for y in 0..5 {
             for x in 0..5 {
                 *self.get_cell((x,y)).unwrap() = *self.get_cell((x+1,y)).unwrap_or(&mut zero);
@@ -68,7 +57,6 @@ impl Block {
 
     pub fn move_right(&mut self)-> &Self{
         let mut zero =0;
-        self.width_move_count += 1;
         for y in 0..5 {
             for x in (0..5).rev() {
                 *self.get_cell((x,y)).unwrap() = *self.get_cell((x-1,y)).unwrap_or(&mut zero);
@@ -79,7 +67,6 @@ impl Block {
 
     pub fn move_up(&mut self)-> &Self{
         let mut zero =0;
-        self.height_move_count += -1;
         for x in 0..5 {
             for y in 0..5 {
                 *self.get_cell((x,y)).unwrap() = *self.get_cell((x,y+1)).unwrap_or(&mut zero);
@@ -90,7 +77,6 @@ impl Block {
 
     pub fn move_down(&mut self)-> &Self{
         let mut zero =0;
-        self.height_move_count += 1;
         for x in 0..5 {
             for y in (0..5).rev() {
                 *self.get_cell((x,y)).unwrap() = *self.get_cell((x,y-1)).unwrap_or(&mut zero);
@@ -307,7 +293,6 @@ mod tests{
             assert_eq!(bc.get_content().into_iter().collect::<Vec::<_>>(), vec![1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         }
         b.rotate();
-        assert_eq!(3, b.rotate_count);
         assert_eq!(b.get_content().into_iter().collect::<Vec::<_>>(), vec![0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
         b.nomalize(); 
         assert_eq!(b.get_content().into_iter().collect::<Vec::<_>>(), vec![1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0]);

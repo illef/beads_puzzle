@@ -12,11 +12,14 @@ pub struct Map {
     width: i32,
     height: i32,
     content: Vec<i32>,
-    current_line: usize,
     parent: Option<Box<Map>>,
 }
 
 impl Map {
+    pub fn complete(&self) -> bool {
+        self.content.iter().all(|v| *v > 0)
+    }
+
     fn paint_impl(&self, b: &Block) -> Option<Map> {
         // 첫번째 빈칸을 찾는다
         let idx = self.content.iter().enumerate().find(|(_, v)| **v == 0);
@@ -88,7 +91,6 @@ impl Map {
             content: std::iter::repeat(0)
                 .take(width as usize * height as usize)
                 .collect(),
-            current_line: 0,
             parent: None,
         };
 
@@ -124,7 +126,6 @@ impl Default for Map {
             width: 6,
             height: 10,
             content: std::iter::repeat(0).take(6 * 10).collect(),
-            current_line: 0,
             parent: None,
         }
     }
