@@ -13,6 +13,7 @@ pub struct Map {
     height: i32,
     content: Vec<i32>,
     current_line: usize,
+    parent: Option<Box<Map>>,
 }
 
 impl Map {
@@ -28,6 +29,7 @@ impl Map {
         // 해당 블럭을 모두 색칠할 수 있는지 확인한다
         let paint_block = |w: i32| -> Option<Map> {
             let mut m = self.clone();
+            m.parent = Some(Box::new(self.clone()));
             for y in 0..5 {
                 for x in 0..5 {
                     let v = b.cell(x, y).unwrap();
@@ -87,6 +89,7 @@ impl Map {
                 .take(width as usize * height as usize)
                 .collect(),
             current_line: 0,
+            parent: None,
         };
 
         for (src, dest) in first_line.iter().zip(m.content.iter_mut()) {
@@ -122,6 +125,7 @@ impl Default for Map {
             height: 10,
             content: std::iter::repeat(0).take(6 * 10).collect(),
             current_line: 0,
+            parent: None,
         }
     }
 }
