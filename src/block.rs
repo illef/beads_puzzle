@@ -2,7 +2,7 @@
 
 
 // 5 x 5 block
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Block{
     initial_value : &'static [i32],
     content: Vec<i32>,
@@ -42,6 +42,17 @@ impl Block {
                 *self.get_cell((4-x,y)).unwrap() = temp;
             }
         }
+    }
+
+    pub fn rotate(&mut self) -> &Self{
+        self.rotate_count = self.rotate_count + 1;
+        let mut org = self.clone();
+        for y in 0..5{
+            for x in 0..5 {
+                *self.get_cell((x, 4-y)).unwrap() = *org.get_cell((y,x)).unwrap();
+            }
+        }
+        self
     }
 
     pub fn move_left(&mut self)-> &Self{
@@ -260,6 +271,17 @@ mod tests{
         assert!(b.is_valid());
 
         assert_eq!(vec![0,6,6,6,6,0,6,0,0,0], b.get_content().into_iter().take(10).collect::<Vec::<_>>());
+
+    }
+
+    #[test]
+    fn rotate_test(){
+        let mut b = Block::new(init::B0);
+        b.rotate();
+        b.rotate();
+        b.rotate();
+        assert_eq!(3, b.rotate_count);
+        assert_eq!(b.get_content().into_iter().collect::<Vec::<_>>(), vec![0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1])
 
     }
 }
