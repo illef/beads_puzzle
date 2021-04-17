@@ -11,6 +11,22 @@ pub struct Map {
 }
 
 impl Map {
+    pub fn new(width: i32, height: i32, first_line: &[i32]) -> Map {
+        let mut m = Map {
+            width,
+            height,
+            content: std::iter::repeat(0)
+                .take(width as usize * height as usize)
+                .collect(),
+        };
+
+        for (src, dest) in first_line.iter().zip(m.content.iter_mut()) {
+            *dest = *src
+        }
+
+        m
+    }
+
     pub fn is_valid(&self) -> bool {
         self.width * self.height == self.content.len() as i32
     }
@@ -60,5 +76,16 @@ impl Display for Map {
             }
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_map_test() {
+        let m = Map::new(3, 3, &[1, 2, 3, 4]);
+        assert_eq!(m.content, vec![1, 2, 3, 4, 0, 0, 0, 0, 0]);
     }
 }
