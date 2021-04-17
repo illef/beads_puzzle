@@ -1,16 +1,84 @@
 //content 가 0 이면 해당 칸에 아무것도 없는것이다
+use std::collections::BTreeSet;
 use std::fmt::Display;
 use std::fmt::Formatter;
 
 use ansi_term::Colour;
 
+use super::*;
+
+#[derive(Clone, PartialEq, Eq, Ord, PartialOrd)]
 pub struct Map {
     width: i32,
     height: i32,
     content: Vec<i32>,
+    current_line: usize,
 }
 
 impl Map {
+    fn paint_impl(&self, b: &Block) -> Option<Map> {
+        // 첫번째 빈칸을 찾는다
+        let idx = self.content.iter().enumerate().find(|(_, v)| **v == 0);
+        if idx.is_none() {
+            return None;
+        }
+        let (idx, _) = idx.unwrap();
+        let row_num = (idx / self.width as usize) as i32;
+
+        // 해당 블럭을 모두 색칠할 수 있는지 확인한다
+        let paint_block = |w: i32| -> Option<Map> {
+            let mut m = self.clone();
+            for y in 0..5 {
+                for x in 0..5 {
+                    let v = b.cell(x, y).unwrap();
+                    if v == 0 {
+                        continue;
+                    }
+                    if let Some(dest) = m.get_cell((w + x, y + row_num)) {
+                        if *dest == 0 {
+                            *dest = v;
+                        } else {
+                            return None;
+                        }
+                    } else {
+                        // dest가 없으므로
+                        return None;
+                    }
+                }
+            }
+            Some(m)
+        };
+
+        for w in 0..self.width {
+            if let Some(m) = paint_block(w) {
+                return Some(m);
+            }
+        }
+
+        None
+    }
+
+    pub fn paint(&self, mut b: Block) -> BTreeSet<Map> {
+        let mut set = BTreeSet::default();
+        for _ in 0..4 {
+            b.rotate();
+            b.nomalize();
+            if let Some(m) = self.paint_impl(&b) {
+                set.insert(m);
+            }
+        }
+        b.re_init();
+        b.reverse();
+        for _ in 0..4 {
+            b.rotate();
+            b.nomalize();
+            if let Some(m) = self.paint_impl(&b) {
+                set.insert(m);
+            }
+        }
+        set
+    }
+
     pub fn new(width: i32, height: i32, first_line: &[i32]) -> Map {
         let mut m = Map {
             width,
@@ -18,6 +86,7 @@ impl Map {
             content: std::iter::repeat(0)
                 .take(width as usize * height as usize)
                 .collect(),
+            current_line: 0,
         };
 
         for (src, dest) in first_line.iter().zip(m.content.iter_mut()) {
@@ -52,6 +121,7 @@ impl Default for Map {
             width: 6,
             height: 10,
             content: std::iter::repeat(0).take(6 * 10).collect(),
+            current_line: 0,
         }
     }
 }
@@ -87,5 +157,38 @@ mod tests {
     fn new_map_test() {
         let m = Map::new(3, 3, &[1, 2, 3, 4]);
         assert_eq!(m.content, vec![1, 2, 3, 4, 0, 0, 0, 0, 0]);
+    }
+
+    #[test]
+    fn paint_test() {
+        {
+            let m = Map::new(6, 2, &[]);
+            let set = m.paint(Block::new(init::B0));
+            assert_eq!(set.len(), 1);
+            assert_eq!(
+                set.into_iter().next().unwrap().content,
+                vec![1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0]
+            );
+        }
+        {
+            let m = Map::new(6, 2, &[2]);
+            let set = m.paint(Block::new(init::B0));
+            assert_eq!(set.len(), 1);
+            assert_eq!(
+                set.into_iter().next().unwrap().content,
+                vec![2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
+            );
+        }
+        {
+            let m = Map::new(6, 4, &[3, 3]);
+            let set = m.paint(Block::new(init::B1));
+            assert_eq!(8, set.len())
+        }
+
+        {
+            let m = Map::new(6, 4, &[3, 3]);
+            let set = m.paint(Block::new(init::B7));
+            assert_eq!(1, set.len())
+        }
     }
 }

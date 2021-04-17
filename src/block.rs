@@ -116,6 +116,16 @@ impl Block {
             Some(&mut self.content[(y * 5+ x) as usize])
         }
     }
+
+    pub fn cell(&self, x: i32, y: i32) -> Option<i32> {
+        if x < 0 || 5 <= x {
+            None
+        } else if y < 0 || 5 <= y {
+            None
+        } else {
+            Some(self.content[(y * 5+ x) as usize])
+        }
+    }
     
     pub fn nomalize(&mut self) {
         // 최 상단에 값이 존재하게 한다
