@@ -1,3 +1,5 @@
+#![allow(soft_unstable)]
+
 #[allow(dead_code)]
 mod block;
 
@@ -145,20 +147,38 @@ fn zinun_problem_6() {
 
     if let Some(answer) = solve(map, blocks) {
         println!("{}", answer);
-    }
-    else {
+    } else {
         println!("답이 없어요!!!");
     }
 }
 
 fn zinun_problem_7() {
-    let map = Map::new_with_fill(6, 10, vec![
-            (0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5,0),
-            (0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5,1),
-            (0, 2), (1, 2), (2, 2), (3, 2), (4, 2), (5,2),
-                            (2, 3),                 (5,3)
-
-    ]);
+    let map = Map::new_with_fill(
+        6,
+        10,
+        vec![
+            (0, 0),
+            (1, 0),
+            (2, 0),
+            (3, 0),
+            (4, 0),
+            (5, 0),
+            (0, 1),
+            (1, 1),
+            (2, 1),
+            (3, 1),
+            (4, 1),
+            (5, 1),
+            (0, 2),
+            (1, 2),
+            (2, 2),
+            (3, 2),
+            (4, 2),
+            (5, 2),
+            (2, 3),
+            (5, 3),
+        ],
+    );
     println!("{}", map);
 
     let mut blocks = Block::get_all();
@@ -169,8 +189,7 @@ fn zinun_problem_7() {
 
     if let Some(answer) = solve(map, blocks) {
         println!("{}", answer);
-    }
-    else {
+    } else {
         println!("답이 없어요!!!");
     }
 }

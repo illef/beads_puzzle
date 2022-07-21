@@ -1,3 +1,4 @@
+#![allow(soft_unstable)]
 #![rustfmt::skip]
 
 use std::collections::BTreeSet;
